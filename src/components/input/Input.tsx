@@ -2,30 +2,58 @@ import axios from 'axios'
 import React, { ChangeEvent, Dispatch, FormEvent, SetStateAction, useState } from 'react'
 
 type Props = {
-  setMessages: Dispatch<SetStateAction<Messages>>
+  setMessages: Dispatch<SetStateAction<Messages>>,
+  chattype: string,
+  context: string
 }
 
-const Input = ({setMessages}: Props) => {
-
+const Input = ({setMessages, chattype, context}: Props) => {
   const [prompt, setPrompt] = useState<string>('')
 
   const handleSubmit = (e: FormEvent)=>{
-    e.preventDefault()
-    setPrompt('')
+    e.preventDefault();
+    setPrompt('');
+
+    //Show the Human Messgae into Header
     setMessages(p => [...p, {
       id: p.length + 1,
       type: 'human',
       message: prompt
-    }])
-    axios.post('/api/langChain', { message: prompt })
-    .then(res => {
-      setMessages(p => [...p, {
-        id: p.length + 2,
-        type: 'AI',
-        message: res.data
-      }])
-    })
-    .catch((e) => console.log(e))
+    }]);
+
+    switch(chattype){
+      case '1':
+        axios.post('/api/langChain', { message: prompt })
+        .then(res => {
+          setMessages(p => [...p, {
+            id: p.length + 2,
+            type: 'AI',
+            message: res.data
+          }]);
+        })
+        .catch((e) => console.log(e));
+        break;
+      case '2':
+        if(context == ''){
+          console.log("input the context!!!");
+          setMessages(p => [...p, {
+            id: p.length + 2,
+            type: 'AI',
+            message: "Alert!!!! Input the Context(Corner Top Right)"
+          }]);
+          return;
+        }
+        axios.post('/api/langChain', { message: prompt })
+        .then(res => {
+          setMessages(p => [...p, {
+            id: p.length + 2,
+            type: 'AI',
+            message: res.data
+          }]);
+        })
+        .catch((e) => console.log(e));
+        break;
+    }
   }
 
   return (

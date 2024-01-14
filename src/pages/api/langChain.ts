@@ -4,7 +4,6 @@ import { ChatPromptTemplate, HumanMessagePromptTemplate, MessagesPlaceholder, Sy
 import { ConversationChain } from 'langchain/chains'
 import { BufferMemory } from "langchain/memory";
 
-
 const chat = new ChatOpenAI({ openAIApiKey: process.env.OPENAI_API_KEY, temperature: 0 });
 
 const chatPrompt = ChatPromptTemplate.fromPromptMessages([
@@ -35,24 +34,18 @@ export default async function handler(
 
   try{
     const r = await chain.call({input: message});
-    
     return res.status(200).json(r.response)
-
   }catch (error: any){
-
     if (error.response) {
       console.log(error.response.data)
       res.status(error.response.status).json(error.response.data.error.message);
-      
     } else {
-
       console.error(`Error with OpenAI API request: ${error.message}`);
       res.status(500).json({
         error: {
           message: 'An error occurred during your request.',
         }
       });
-
     }
 
   }

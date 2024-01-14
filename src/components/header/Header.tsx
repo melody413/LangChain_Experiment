@@ -19,7 +19,7 @@ const Header = ({messages}: Props) => {
       <div ref={chatRef} className={s.container} >
       {
         messages && messages.map((v, i)=>(
-          <div key={v.id} className={[v.type === 'AI' ? s.aiMessage : s.humanMessage, s.message].join(' ') } >
+          <div key={i} className={[v.type === 'AI' ? s.aiMessage : s.humanMessage, s.message].join(' ') } >
             <ReactMarkdown>
               {v.message}
             </ReactMarkdown>
