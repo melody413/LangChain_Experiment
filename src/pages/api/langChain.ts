@@ -1,8 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { ChatOpenAI } from "langchain/chat_models/openai"
-import { ChatPromptTemplate, HumanMessagePromptTemplate, MessagesPlaceholder, SystemMessagePromptTemplate } from 'langchain/prompts'
+import { ChatOpenAI } from "@langchain/openai"
+import { ChatPromptTemplate, HumanMessagePromptTemplate, MessagesPlaceholder, SystemMessagePromptTemplate } from '@langchain/core/prompts'
 import { ConversationChain } from 'langchain/chains'
 import { BufferMemory } from "langchain/memory";
+import { DynamoDBChatMessageHistory } from "@langchain/community/stores/message/dynamodb";
 
 const chat = new ChatOpenAI({ openAIApiKey: process.env.OPENAI_API_KEY, temperature: 0 });
 
@@ -14,8 +15,24 @@ const chatPrompt = ChatPromptTemplate.fromPromptMessages([
   HumanMessagePromptTemplate.fromTemplate("{input}"),
 ]);
 
+const memory = new BufferMemory({
+  chatHistory: new DynamoDBChatMessageHistory({
+    tableName: "langchain",
+    partitionKey: "id",
+    sessionId: new Date().toISOString(), // Or some other unique identifier for the conversation
+    config: {
+      region: "us-east-2",
+      credentials: {
+        accessKeyId: 'AKIAVM72X6PHONWOSP6N',
+        secretAccessKey: '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',
+      },
+    },
+  }),
+});
+
 const chain = new ConversationChain({
   memory: new BufferMemory({ returnMessages: true, memoryKey: "history" }),
+  // memory: memory,
   prompt: chatPrompt,
   llm: chat,
 });

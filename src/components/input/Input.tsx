@@ -43,7 +43,7 @@ const Input = ({setMessages, chattype, context}: Props) => {
           }]);
           return;
         }
-        axios.post('/api/langChain', { message: prompt })
+        axios.post('/api/retrievalChain', { message: prompt, context: context })
         .then(res => {
           setMessages(p => [...p, {
             id: p.length + 2,
